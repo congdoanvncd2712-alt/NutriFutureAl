@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUTRIFUTURE – Ứng dụng Học tập & Thực hành Dinh dưỡng Học sinh THPT</title>
+  <meta name="description" content="NUTRIFUTURE – Nền tảng học tập và thực hành dinh dưỡng thông minh dành cho học sinh trường THCS & THPT Ngã Sáu (15-22 tuổi).">
+  <meta name="theme-color" content="#16a34a">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="default">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HEADER (THANH ĐIỀU HƯỚNG TRÊN CÙNG)
+  ═══════════════════════════════════════════════════════════════ -->
+  <header class="app-header">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+
+      <!-- Logo & Tiêu đề thương hiệu -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('profile')">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-green-600 to-emerald-500 flex items-center justify-center text-white text-xl shadow-md shadow-green-600/30 flex-shrink-0">
+          🥗
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-black tracking-tight text-slate-900">NUTRI<span class="text-green-600">FUTURE</span></span>
+            <span class="text-[10px] font-bold px-1.5 py-0.5 bg-green-100 text-green-800 rounded-md">v3.2 AI</span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium hidden sm:block">Dinh dưỡng học đường · THCS & THPT Ngã Sáu</p>
+        </div>
+      </div>
+
+      <!-- Điều khiển góc phải: Theme, XP, Streak & Gemini API -->
+      <div class="flex items-center gap-2 sm:gap-3">
+
+        <!-- Chuỗi ngày (Streak) -->
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-orange-50 border border-orange-200 rounded-xl" title="Chuỗi ngày liên tục mở ứng dụng">
+          <span class="text-sm">🔥</span>
+          <span id="header-streak" class="text-xs font-black text-orange-900">3 ngày</span>
+        </div>
+
+        <!-- Điểm thưởng (XP) & Cấp -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer" onclick="switchTab('gamification')">
+          <span class="text-sm">⭐</span>
+          <div>
+            <div id="header-points" class="text-xs font-black text-amber-900 leading-none">120 XP</div>
+            <div id="header-level" class="text-[10px] text-amber-700 font-bold leading-none mt-0.5">Cấp 2</div>
+          </div>
+        </div>
+
+        <!-- Cài đặt Gemini API -->
+        <button onclick="openModal('gemini-api-modal')"
+                id="header-api-btn"
+                title="Cài đặt Google Gemini AI"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-green-400 hover:bg-green-50 text-xs font-bold text-slate-700 hover:text-green-800 transition-all shadow-[var(--shadow-xs)]">
+          <span id="header-api-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0"></span>
+          <span>✨ Gemini AI</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       BỐ CỤC CHÍNH (SIDEBAR & NỘI DUNG 6 TÍNH NĂNG)
+  ═══════════════════════════════════════════════════════════════ -->
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-5 flex gap-5">
+
+    <!-- ─── DESKTOP SIDEBAR: 6 TÍNH NĂNG CHÍNH ────────────────── -->
+    <aside class="hidden lg:flex flex-col gap-3 w-64 flex-shrink-0">
+      <div class="card p-3 sticky top-20 space-y-1">
+        <p class="section-title px-3 py-2 flex items-center justify-between">
+          <span>6 Tính năng chính</span>
+          <span class="text-[10px] text-green-700 font-bold bg-green-50 px-1.5 py-0.5 rounded">THPT</span>
+        </p>
+
+        <!-- Tính năng 1: Khởi tạo hồ sơ & Cảnh báo dị ứng (Mặc định mở đầu tiên) -->
+        <button data-tab-target="profile" class="sidebar-nav-item active">
+          <span class="nav-icon">👤</span>
+          <span>1. Hồ sơ & Dị ứng</span>
+          <span class="nav-badge">Bắt đầu</span>
+        </button>
+
+        <!-- Tính năng 2: Tra cứu dinh dưỡng thông minh -->
+        <button data-tab-target="lookup" class="sidebar-nav-item">
+          <span class="nav-icon">🔍</span>
+          <span>2. Tra cứu dinh dưỡng</span>
+          <span class="nav-badge">202 món</span>
+        </button>
+
+        <!-- Tính năng 3: Nhận diện thực phẩm bằng AI -->
+        <button data-tab-target="camera" class="sidebar-nav-item">
+          <span class="nav-icon">📸</span>
+          <span>3. Nhận diện AI Cam</span>
+          <span class="nav-badge">Gemini</span>
+        </button>
+
+        <!-- Tính năng 4: Gợi ý và xây dựng thực đơn khoa học -->
+        <button data-tab-target="mealplan" class="sidebar-nav-item">
+          <span class="nav-icon">🍱</span>
+          <span>4. Gợi ý thực đơn</span>
+          <span class="nav-badge">4 nhóm chất</span>
+        </button>
+
+        <!-- Tính năng 5: Nhật ký dinh dưỡng và theo dõi -->
+        <button data-tab-target="diary" class="sidebar-nav-item">
+          <span class="nav-icon">📊</span>
+          <span>5. Nhật ký & Theo dõi</span>
+          <span class="nav-badge">Biểu đồ</span>
+        </button>
+
+        <!-- Tính năng 6: Gamification – Học mà chơi -->
+        <button data-tab-target="gamification" class="sidebar-nav-item">
+          <span class="nav-icon">🎮</span>
+          <span>6. Gamification Quiz</span>
+          <span class="nav-badge">+XP</span>
+        </button>
+      </div>
+
+      <!-- Banner Trường Ngã Sáu -->
+      <div class="card p-4 bg-gradient-to-br from-green-700 to-emerald-900 border-none text-white space-y-2">
+        <div class="text-xs font-bold flex items-center gap-1.5">
+          🏫 THCS & THPT Ngã Sáu
+        </div>
+        <p class="text-green-100 text-[11px] leading-relaxed">
+          Ứng dụng thiết kế đặc quyền dành cho học sinh Ngã Sáu (15-22 tuổi) phát triển thể chất và kiến thức dinh dưỡng chuẩn khoa học.
+        </p>
+        <div class="pt-2 border-t border-green-600/40 flex items-center justify-between text-[10px] text-green-200">
+          <span>Tỉnh Hậu Giang</span>
+          <span>Deploy: GitHub Pages</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── KHU VỰC NỘI DUNG CHÍNH (6 TABS) ───────────────────── -->
+    <main class="flex-1 min-w-0 space-y-4">
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 1: KHỞI TẠO HỒ SƠ & CẢNH BÁO DỊ ỨNG
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-profile" class="tab-pane active space-y-4">
+
+        <!-- Banner Tính năng 1 -->
+        <div class="feature-banner bg-gradient-to-br from-emerald-600 via-teal-700 to-green-800">
+          <span class="banner-tag">Tính năng 1</span>
+          <h2>Khởi tạo Hồ sơ & Cảnh báo Dị ứng</h2>
+          <p>Dành riêng cho học sinh trường THCS & THPT Ngã Sáu (15–22 tuổi) · Tính BMI · Nhu cầu Calo & Nước · Bảo vệ sức khỏe với hồ sơ dị ứng</p>
+          <span class="banner-emoji">👤</span>
+        </div>
+
+        <!-- Hộp ví dụ chuẩn của đề bài -->
+        <div class="p-3.5 bg-green-50 border border-green-200 rounded-2xl flex items-center gap-3 text-xs text-green-900">
+          <span class="text-2xl flex-shrink-0">💡</span>
+          <div>
+            <strong>Ví dụ chuẩn:</strong> Nam, 17 tuổi, cao 170cm, nặng 60kg → <strong>BMI 20.8</strong> (Bình thường), cần <strong>2.200 kcal/ngày</strong>, uống <strong>2.1 lít nước/ngày (~8–9 ly)</strong>.
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          <!-- Bảng nhập thông tin cá nhân & dị ứng -->
+          <div class="lg:col-span-6 card p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                📝 Thông tin cá nhân học sinh
+              </h3>
+              <span class="text-[11px] text-slate-400 font-medium">Độ tuổi 15–22</span>
+            </div>
+
+            <form id="profile-form" class="space-y-3.5" onsubmit="event.preventDefault(); saveProfileForm();">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Họ và tên học sinh:</label>
+                <input type="text" id="profile-name" value="Học sinh Ngã Sáu" required class="input text-sm font-medium">
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Tuổi (15 – 22):</label>
+                  <input type="number" id="profile-age" min="15" max="22" value="17" required class="input text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Giới tính:</label>
+                  <select id="profile-gender" class="input text-sm font-medium">
+                    <option value="male" selected>Nam</option>
+                    <option value="female">Nữ</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Chiều cao (cm):</label>
+                  <input type="number" id="profile-height" min="120" max="220" value="170" required class="input text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Cân nặng (kg):</label>
+                  <input type="number" id="profile-weight" min="30" max="150" value="60" required class="input text-sm">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mức độ vận động:</label>
+                <select id="profile-activity" class="input text-sm font-medium">
+                  <option value="sedentary">Ít vận động (Chủ yếu ngồi học)</option>
+                  <option value="light">Vận động nhẹ (Đi bộ, GDTC 1–2 buổi/tuần)</option>
+                  <option value="moderate" selected>Vừa phải (Đá bóng, cầu lông 3–5 buổi/tuần)</option>
+                  <option value="active">Năng động (Tập thể thao cường độ cao hàng ngày)</option>
+                </select>
+              </div>
+
+              <!-- HỒ SƠ DỊ ỨNG THỰC PHẨM -->
+              <div class="pt-3 border-t border-slate-100 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="block text-xs font-extrabold text-red-600 flex items-center gap-1.5">
+                    <span>🚨</span> Thành phần gây dị ứng của bạn (nếu có):
+                  </label>
+                  <span class="text-[10px] text-slate-400">Chọn để kích hoạt Cảnh báo đỏ</span>
+                </div>
+                
+                <p class="text-[11px] text-slate-500 leading-snug">
+                  Hệ thống sẽ lưu trữ và tự động đối chiếu khi bạn tra cứu món hoặc quét ảnh camera để phát cảnh báo (Red Alert).
+                </p>
+
+                <!-- Chips chọn dị ứng nhanh -->
+                <div class="flex flex-wrap gap-1.5" id="profile-allergen-chips">
+                  <!-- Rendered dynamically by JS -->
+                </div>
+
+                <div class="pt-1">
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Thành phần dị ứng khác (nếu có):</label>
+                  <input type="text" id="profile-custom-allergen" placeholder="Ví dụ: mè vừng, hành tỏi..." class="input text-xs">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-full py-2.5 mt-2 text-sm shadow-md">
+                💾 Lưu Hồ Sơ & Tính Toán Chỉ Số
+              </button>
+            </form>
+          </div>
+
+          <!-- Kết quả tính toán chỉ số sức khỏe -->
+          <div class="lg:col-span-6 space-y-4">
+
+            <!-- BMI & Tình trạng cân nặng -->
+            <div class="grid grid-cols-2 gap-3">
+              <div class="stat-box bg-gradient-to-br from-white to-green-50/50">
+                <span class="stat-label">Chỉ số BMI (Thể trạng)</span>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span id="res-bmi-val" class="stat-value text-green-700">20.8</span>
+                  <span id="res-bmi-category" class="text-[11px] font-black px-2.5 py-0.5 bg-green-100 text-green-800 rounded-full">Bình thường</span>
+                </div>
+                <p id="res-bmi-advice" class="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                  Thể trạng rất cân đối. Tiếp tục duy trì chế độ dinh dưỡng lành mạnh và thể dục thể thao!
+                </p>
+              </div>
+
+              <div class="stat-box bg-gradient-to-br from-white to-amber-50/50">
+                <span class="stat-label">Nhu cầu Calo mỗi ngày</span>
+                <div class="flex items-baseline gap-1 mt-1">
+                  <span id="res-tdee-val" class="stat-value text-amber-700">2,200</span>
+                  <span class="text-xs text-slate-400 font-bold">kcal/ngày</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                  Công thức Mifflin-St Jeor chuẩn hóa cho lứa tuổi học sinh THPT năng động.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lượng nước cần uống -->
+            <div class="stat-box flex items-center justify-between bg-gradient-to-br from-white to-sky-50/60">
+              <div>
+                <span class="stat-label">Lượng nước cần uống mỗi ngày</span>
+                <div id="res-water-val" class="text-2xl font-black text-sky-700 mt-1">2.1 Lít / ngày</div>
+                <p id="res-glasses-val" class="text-xs text-slate-500 mt-1 font-medium">~ 8 – 9 ly nước (mỗi ly 250ml) giúp thanh lọc và tập trung học tập</p>
+              </div>
+              <span class="text-4xl flex-shrink-0 animate-bounce">💧</span>
+            </div>
+
+            <!-- Phân bổ 3 nhóm dưỡng chất chính -->
+            <div class="card p-4 space-y-3">
+              <h4 class="section-title">Phân bổ 3 chất dinh dưỡng đa lượng (Macronutrients)</h4>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-3 bg-red-50 rounded-xl border border-red-200">
+                  <span class="text-[11px] font-black text-red-700 block">Đạm (Protein)</span>
+                  <div id="res-macro-protein" class="text-lg font-black text-red-900 mt-0.5">110g</div>
+                  <span class="text-[10px] text-slate-500">20% · Cơ bắp & Chiều cao</span>
+                </div>
+                <div class="p-3 bg-yellow-50 rounded-xl border border-yellow-200">
+                  <span class="text-[11px] font-black text-yellow-700 block">Chất béo (Fat)</span>
+                  <div id="res-macro-fat" class="text-lg font-black text-yellow-900 mt-0.5">55g</div>
+                  <span class="text-[10px] text-slate-500">25% · Não bộ & Vitamin</span>
+                </div>
+                <div class="p-3 bg-sky-50 rounded-xl border border-sky-200">
+                  <span class="text-[11px] font-black text-sky-700 block">Bột đường (Carb)</span>
+                  <div id="res-macro-carb" class="text-lg font-black text-sky-900 mt-0.5">303g</div>
+                  <span class="text-[10px] text-slate-500">55% · Năng lượng học tập</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tóm tắt hồ sơ dị ứng đã lưu -->
+            <div class="card p-4 bg-slate-50 border-slate-200 space-y-2">
+              <span class="section-title text-red-600 flex items-center gap-1.5">
+                🛡️ Hồ sơ bảo vệ dị ứng đang hoạt động
+              </span>
+              <div id="res-allergies-summary" class="text-xs text-slate-600 leading-relaxed">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 2: TRA CỨU DINH DƯỠNG THÔNG MINH
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-lookup" class="tab-pane space-y-4">
+
+        <!-- Banner Tính năng 2 -->
+        <div class="feature-banner bg-gradient-to-br from-green-600 via-emerald-600 to-teal-700">
+          <span class="banner-tag">Tính năng 2</span>
+          <h2>Tra cứu Dinh dưỡng Thông minh</h2>
+          <p>Cơ sở dữ liệu 202 món ăn chuẩn hóa Bắc – Trung – Nam & Đặc sản tỉnh thành · Tùy chọn khẩu phần S / M / L · Tự động phát cảnh báo dị ứng Red Alert</p>
+          <span class="banner-emoji">🍲</span>
+        </div>
+
+        <!-- Thanh tìm kiếm & Bộ lọc -->
+        <div class="card p-4 space-y-3">
+
+          <!-- Ô tìm kiếm & Nút AI Gemini Search -->
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <span class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">🔍</span>
+              <input type="text"
+                     id="food-search-input"
+                     placeholder="Nhập tên món (Cơm trắng, Phở bò, Bánh xèo...) hoặc câu hỏi AI..."
+                     class="input pl-9 text-sm">
+            </div>
+            <button id="btn-ai-search"
+                    onclick="handleGeminiAiSearch()"
+                    class="btn btn-primary flex-shrink-0">
+              ✨ AI Search
+            </button>
+          </div>
+
+          <!-- Phản hồi từ AI Search nếu có -->
+          <div id="ai-search-feedback-banner" class="hidden p-3 bg-green-50 border border-green-200 rounded-xl text-xs space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-green-900 flex items-center gap-1.5">🤖 Gợi ý từ Gemini AI:</span>
+              <button onclick="clearAiSearchFilter()" class="text-slate-400 hover:text-slate-600 font-semibold text-[11px]">✕ Đóng</button>
+            </div>
+            <p id="ai-search-feedback-text" class="text-green-800 leading-relaxed pl-5"></p>
+          </div>
+
+          <!-- Bộ lọc 3 Vùng miền: Bắc - Trung - Nam -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+            <span class="font-bold text-slate-400 mr-1 text-[11px] uppercase tracking-wider">Vùng miền:</span>
+            <button onclick="filterRegion('all')" id="region-btn-all" class="category-pill active">🌐 Tất cả (202)</button>
+            <button onclick="filterRegion('bac')" id="region-btn-bac" class="category-pill">🏔️ Miền Bắc (69)</button>
+            <button onclick="filterRegion('trung')" id="region-btn-trung" class="category-pill">🏖️ Miền Trung (59)</button>
+            <button onclick="filterRegion('nam')" id="region-btn-nam" class="category-pill">🌾 Miền Nam (74)</button>
+          </div>
+
+          <!-- Bộ lọc Nhóm món ăn -->
+          <div class="flex gap-1.5 overflow-x-auto pb-0.5 no-scrollbar" id="food-categories-bar"></div>
+
+          <!-- Đếm kết quả & Chú thích khẩu phần -->
+          <div class="flex flex-wrap justify-between items-center text-xs text-slate-500 pt-1 border-t border-slate-100">
+            <span id="food-search-count" class="font-bold text-green-700">Đang hiển thị 202 / 202 món</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">Khẩu phần tùy chọn:</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 bg-slate-100 rounded">S = 70%</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 bg-green-100 text-green-800 rounded">M = 100%</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 bg-slate-100 rounded">L = 130%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lưới hiển thị danh thiếp 202 món ăn -->
+        <div id="food-items-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 3: NHẬN DIỆN THỰC PHẨM BẰNG AI (CAMERA)
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-camera" class="tab-pane space-y-4">
+
+        <!-- Banner Tính năng 3 -->
+        <div class="feature-banner bg-gradient-to-br from-sky-600 via-indigo-600 to-blue-800">
+          <span class="banner-tag">Tính năng 3</span>
+          <h2>Nhận diện Thực phẩm bằng AI (Camera)</h2>
+          <p>Quét ảnh trực tiếp bằng Camera hoặc tải ảnh lên · Phân tích Calo & 4 nhóm chất · Nút điều chỉnh khẩu phần Ít/Vừa/Nhiều · Cảnh báo kép dị ứng Red Alert</p>
+          <span class="banner-emoji">📸</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+          <!-- Khung ngắm Camera & Nút điều khiển -->
+          <div class="lg:col-span-6 card p-5 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                📷 Khung quét Camera & Tải ảnh
+              </h3>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">AI Vision</span>
+            </div>
+
+            <!-- Viewfinder -->
+            <div class="viewfinder-box aspect-video flex items-center justify-center">
+              <div id="camera-placeholder" class="text-center p-4 text-slate-400 space-y-2">
+                <span class="text-5xl block animate-pulse">🍽️</span>
+                <p class="text-xs text-slate-300 font-medium">Bấm "Bật Camera" hoặc bấm "Thêm hình ảnh" để AI quét bữa ăn</p>
+              </div>
+              <div id="camera-preview-container" class="hidden w-full h-full">
+                <video id="camera-video" playsinline autoplay class="w-full h-full object-cover"></video>
+              </div>
+            </div>
+
+            <!-- Nút điều khiển rõ ràng: Bật/Chụp KẾ BÊN Thêm hình ảnh -->
+            <div class="space-y-2">
+              <div class="flex flex-wrap gap-2">
+                <!-- Nút Bật Camera -->
+                <button id="btn-start-camera" class="btn btn-primary flex-1 py-2.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  Bật Camera
+                </button>
+
+                <!-- Nút Chụp & Phân tích (Hiện khi camera bật) -->
+                <button id="btn-capture-photo" class="btn hidden flex-1 bg-amber-500 hover:bg-amber-600 text-white shadow-md pulse-active py-2.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  Chụp ảnh ngay
+                </button>
+
+                <!-- Nút Tắt Camera -->
+                <button id="btn-stop-camera" class="btn btn-secondary hidden">Tắt Cam</button>
+
+                <!-- NÚT THÊM HÌNH ẢNH NẰM NGAY KẾ BÊN NÚT CHỤP -->
+                <label class="btn btn-secondary flex-1 cursor-pointer py-2.5">
+                  <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>Thêm hình ảnh</span>
+                  <input type="file" id="ai-file-input" accept="image/*" class="hidden">
+                </label>
+              </div>
+
+              <!-- Hướng dẫn Gemini API siêu tốc, miễn phí & an toàn -->
+              <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-900 flex items-center justify-between">
+                <span>💡 Sử dụng model <strong>gemini-1.5-flash / gemini-2.0-flash</strong> siêu tốc, ít tốn quota nhất.</span>
+                <button onclick="openModal('gemini-api-modal')" class="underline font-bold text-sky-950 ml-2 flex-shrink-0">Hướng dẫn lấy API</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bảng kết quả nhận diện AI & Điều chỉnh định lượng -->
+          <div class="lg:col-span-6 space-y-4">
+
+            <!-- Trạng thái trống -->
+            <div id="ai-empty-placeholder" class="card p-8 text-center h-full flex flex-col items-center justify-center gap-3">
+              <span class="text-6xl">🤖</span>
+              <h4 class="font-bold text-slate-800 text-base">Chưa có ảnh nhận diện</h4>
+              <p class="text-xs text-slate-500 max-w-sm leading-relaxed">
+                Chụp ảnh hoặc tải lên bữa ăn của bạn (Cơm tấm, Phở bò, Bánh mì, Bún mắm, Bánh xèo...). AI sẽ nhận diện món, đặc sản vùng miền và phân tích dinh dưỡng tức thì!
+              </p>
+            </div>
+
+            <!-- Trạng thái đang phân tích -->
+            <div id="ai-loading-card" class="hidden card p-8 text-center space-y-4">
+              <div class="w-12 h-12 border-4 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <h4 class="font-bold text-slate-800 text-sm">Gemini AI đang phân tích ảnh món ăn...</h4>
+              <p class="text-xs text-slate-400">Đang đối chiếu dữ liệu 202 món ăn Việt Nam & kiểm tra dị ứng...</p>
+            </div>
+
+            <!-- Bảng kết quả sau nhận diện -->
+            <div id="ai-result-card" class="hidden card p-5 space-y-4 border-sky-300 shadow-md">
+
+              <!-- Cảnh báo kép Dị ứng Red Alert (nếu có dị nguyên) -->
+              <div id="ai-allergy-alert-box" class="hidden"></div>
+
+              <!-- Tiêu đề món & Ảnh thu nhỏ -->
+              <div class="flex items-start gap-3 pb-3 border-b border-slate-100">
+                <img id="ai-captured-preview" src="" alt="Món ăn" class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm flex-shrink-0">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span id="ai-result-confidence" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Độ tin cậy: 96%</span>
+                    <span id="ai-result-region-tag" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">Miền Nam</span>
+                  </div>
+                  <h3 id="ai-result-food-name" class="font-black text-lg text-slate-900 mt-1 truncate">Cơm tấm sườn bì chả</h3>
+                  <p id="ai-result-specialty" class="text-xs text-slate-500 font-semibold flex items-center gap-1 mt-0.5">
+                    <span>📍 Đặc sản:</span> <span id="ai-result-specialty-city" class="text-green-700">Sài Gòn</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- THANH CHỌN ĐỊNH LƯỢNG (ÍT - VỪA - NHIỀU) KHẮC PHỤC HẠN CHẾ AI -->
+              <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-extrabold text-slate-700 flex items-center gap-1.5">
+                    ⚖️ Điều chỉnh định lượng thực tế:
+                  </span>
+                  <span id="ai-portion-label" class="font-bold text-sky-700">Khẩu phần Vừa (100%)</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" onclick="setAiPortionSize('S')" id="ai-portion-btn-s" class="btn btn-secondary btn-sm font-bold">
+                    Ít (70%)
+                  </button>
+                  <button type="button" onclick="setAiPortionSize('M')" id="ai-portion-btn-m" class="btn btn-primary btn-sm font-bold">
+                    Vừa (100%)
+                  </button>
+                  <button type="button" onclick="setAiPortionSize('L')" id="ai-portion-btn-l" class="btn btn-secondary btn-sm font-bold">
+                    Nhiều (130%)
+                  </button>
+                </div>
+              </div>
+
+              <!-- 4 Chỉ số dinh dưỡng chính -->
+              <div class="grid grid-cols-4 gap-2 text-center">
+                <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                  <div class="text-[10px] text-amber-700 font-bold">Calo</div>
+                  <div id="ai-result-calories" class="text-base font-black text-amber-900">650</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-red-50 border border-red-200">
+                  <div class="text-[10px] text-red-700 font-bold">Đạm</div>
+                  <div id="ai-result-protein" class="text-base font-black text-red-900">30g</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-yellow-50 border border-yellow-200">
+                  <div class="text-[10px] text-yellow-700 font-bold">Béo</div>
+                  <div id="ai-result-fat" class="text-base font-black text-yellow-900">25g</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-200">
+                  <div class="text-[10px] text-sky-700 font-bold">Carb</div>
+                  <div id="ai-result-carb" class="text-base font-black text-sky-900">75g</div>
+                </div>
+              </div>
+
+              <!-- Vi chất và lời khuyên -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
+                <p><strong class="text-slate-700">✨ Vi chất & Vitamin:</strong> <span id="ai-result-vitamins" class="text-slate-600">Sắt, Vitamin B1, Choline</span></p>
+                <p><strong class="text-slate-700">💡 Đánh giá dinh dưỡng:</strong> <span id="ai-result-advice" class="text-slate-600">Cung cấp dồi dào năng lượng và chất đạm cho học sinh.</span></p>
+              </div>
+
+              <!-- Nút Lưu vào Nhật ký -->
+              <button onclick="saveAiResultToDiary()" class="btn btn-primary w-full py-2.5 shadow-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Lưu vào Nhật ký hôm nay
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 4: GỢI Ý & XÂY DỰNG THỰC ĐƠN KHOA HỌC
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-mealplan" class="tab-pane space-y-4">
+
+        <!-- Banner Tính năng 4 -->
+        <div class="feature-banner bg-gradient-to-br from-amber-600 via-orange-600 to-green-700">
+          <span class="banner-tag">Tính năng 4</span>
+          <h2>Gợi ý và Xây dựng Thực đơn Khoa học</h2>
+          <p>Tự động phân bổ 3 bữa chính Sáng (30%) – Trưa (40%) – Tối (30%) · Đảm bảo đủ 4 nhóm chất có rau xanh & trái cây · Nút "Đổi thực đơn khác" linh hoạt</p>
+          <span class="banner-emoji">🍱</span>
+        </div>
+
+        <!-- Điều khiển thực đơn -->
+        <div class="card p-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="space-y-0.5">
+            <p class="text-xs font-bold text-slate-800">
+              Mục tiêu calo học sinh: <strong id="mealplan-target-calo-text" class="text-green-700">2,200 kcal</strong>
+            </p>
+            <p class="text-[11px] text-slate-500">
+              Tỷ lệ vàng: <strong>Sáng 30% · Trưa 40% · Tối 30%</strong> (có rau xanh và trái cây tươi)
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <!-- Nút đổi thực đơn khác -->
+            <button id="btn-reroll-mealplan" onclick="generateBalancedMealPlan()" class="btn btn-primary btn-sm shadow-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Đổi thực đơn khác
+            </button>
+            <!-- Áp dụng vào nhật ký -->
+            <button id="btn-apply-mealplan-diary" onclick="applyGeneratedMealPlanToDiary()" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white shadow-sm">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Áp vào Nhật ký
+            </button>
+          </div>
+        </div>
+
+        <!-- Tổng quan dinh dưỡng thực đơn -->
+        <div id="mealplan-total-banner" class="card p-4 bg-green-50/70 border-green-200"></div>
+
+        <!-- 3 Bữa ăn chính trong ngày -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <!-- Bữa Sáng (30%) -->
+          <div class="card p-4 flex flex-col justify-between gap-3 border-amber-200">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">🌅</span>
+                  <h3 class="font-extrabold text-slate-800 text-sm">Bữa Sáng</h3>
+                </div>
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">30% Calo</span>
+              </div>
+              <div id="mealplan-breakfast-items" class="mt-3 space-y-2"></div>
+            </div>
+            <div id="mealplan-breakfast-summary" class="text-[11px] text-slate-500 pt-2 border-t border-slate-100"></div>
+          </div>
+
+          <!-- Bữa Trưa (40%) -->
+          <div class="card p-4 flex flex-col justify-between gap-3 border-green-200">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">☀️</span>
+                  <h3 class="font-extrabold text-slate-800 text-sm">Bữa Trưa</h3>
+                </div>
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-800">40% Calo</span>
+              </div>
+              <div id="mealplan-lunch-items" class="mt-3 space-y-2"></div>
+            </div>
+            <div id="mealplan-lunch-summary" class="text-[11px] text-slate-500 pt-2 border-t border-slate-100"></div>
+          </div>
+
+          <!-- Bữa Tối (30%) -->
+          <div class="card p-4 flex flex-col justify-between gap-3 border-sky-200">
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">🌙</span>
+                  <h3 class="font-extrabold text-slate-800 text-sm">Bữa Tối</h3>
+                </div>
+                <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-sky-100 text-sky-800">30% Calo</span>
+              </div>
+              <div id="mealplan-dinner-items" class="mt-3 space-y-2"></div>
+            </div>
+            <div id="mealplan-dinner-summary" class="text-[11px] text-slate-500 pt-2 border-t border-slate-100"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 5: NHẬT KÝ DINH DƯỠNG VÀ THEO DÕI
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-diary" class="tab-pane space-y-4">
+
+        <!-- Banner Tính năng 5 -->
+        <div class="feature-banner bg-gradient-to-br from-teal-700 via-emerald-800 to-green-900">
+          <span class="banner-tag">Tính năng 5</span>
+          <h2>Nhật ký Dinh dưỡng & Theo dõi</h2>
+          <p>Ghi lại món ăn tiêu thụ · Biểu đồ vòng tròn Calo nạp vs Mục tiêu · Phân tích 3 nhóm chất & Lời khuyên thông minh · Sao lưu & Khôi phục file JSON</p>
+          <span class="banner-emoji">📊</span>
+        </div>
+
+        <!-- Bảng điều khiển Calo với Biểu đồ vòng tròn (Donut Chart) -->
+        <div class="card p-5 space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+
+            <!-- Biểu đồ Donut SVG so sánh Calo đã nạp vs Mục tiêu -->
+            <div class="md:col-span-4 text-center">
+              <div class="circular-chart-container">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                  <path class="circle-bg"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="diary-donut-progress" class="circle-progress stroke-green-500"
+                    stroke-dasharray="0, 100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="circular-chart-center">
+                  <span id="diary-donut-percent" class="text-xl font-black text-slate-800">0%</span>
+                  <span class="text-[10px] text-slate-400 font-bold uppercase">Mục tiêu</span>
+                </div>
+              </div>
+              <div class="mt-2 text-xs font-semibold text-slate-500">
+                Đã nạp <strong id="diary-donut-consumed" class="text-green-700 font-black">0</strong> / <span id="diary-donut-target">2,200</span> kcal
+              </div>
+            </div>
+
+            <!-- Thống kê chi tiết 3 nhóm đa lượng -->
+            <div class="md:col-span-8 space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span class="section-title">Tiến độ dinh dưỡng 3 nhóm chất hôm nay</span>
+                <div class="flex gap-1.5">
+                  <button onclick="exportDiaryDataAsJson()" class="btn btn-secondary btn-sm" title="Xuất dữ liệu file JSON">
+                    📥 Xuất JSON
+                  </button>
+                  <label class="btn btn-secondary btn-sm cursor-pointer" title="Nhập dữ liệu file JSON">
+                    📤 Nhập JSON
+                    <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importDiaryDataFromJson(event)">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Thanh tiến độ Calo tổng -->
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs font-bold">
+                  <span class="text-slate-600">Năng lượng Calo:</span>
+                  <span id="diary-cal-progress-text" class="text-green-700">0 / 2,200 kcal (0%)</span>
+                </div>
+                <div class="progress-track h-2.5">
+                  <div id="diary-cal-progressbar" class="progress-fill bg-green-500" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <!-- 3 Nhóm chất Carb, Protein, Fat -->
+              <div class="grid grid-cols-3 gap-2 pt-2">
+                <div class="p-2.5 rounded-xl bg-red-50 border border-red-200">
+                  <div class="flex justify-between text-[10px] font-bold text-red-700">
+                    <span>Đạm (Pro)</span>
+                    <span id="diary-pro-val">0/110g</span>
+                  </div>
+                  <div class="progress-track h-1.5 mt-1.5"><div id="diary-pro-bar" class="progress-fill h-1.5 bg-red-500" style="width:0%"></div></div>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-yellow-50 border border-yellow-200">
+                  <div class="flex justify-between text-[10px] font-bold text-yellow-700">
+                    <span>Chất béo</span>
+                    <span id="diary-fat-val">0/55g</span>
+                  </div>
+                  <div class="progress-track h-1.5 mt-1.5"><div id="diary-fat-bar" class="progress-fill h-1.5 bg-yellow-500" style="width:0%"></div></div>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-200">
+                  <div class="flex justify-between text-[10px] font-bold text-sky-700">
+                    <span>Carb</span>
+                    <span id="diary-carb-val">0/303g</span>
+                  </div>
+                  <div class="progress-track h-1.5 mt-1.5"><div id="diary-carb-bar" class="progress-fill h-1.5 bg-sky-500" style="width:0%"></div></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Hộp Lời khuyên Dinh dưỡng Tự động (Smart Advice) -->
+        <div id="diary-alerts-container" class="space-y-2"></div>
+
+        <!-- Theo dõi Nước uống (Ly nước) -->
+        <div class="card p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">💧</span>
+              <div>
+                <h3 class="text-sm font-bold text-slate-800">Theo dõi Nước uống mỗi ngày</h3>
+                <p class="text-[11px] text-slate-400">Mỗi ly nước = 250ml · Nhấn vào từng ly để đánh dấu</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span id="diary-water-consumed" class="text-base font-black text-sky-700">1000 ml</span>
+              <span id="diary-water-target" class="text-xs text-slate-400 block font-semibold">/ 2,100 ml</span>
+            </div>
+          </div>
+          <div id="water-glasses-grid" class="grid grid-cols-4 sm:grid-cols-8 gap-2"></div>
+          <div class="flex justify-end">
+            <button id="btn-add-water-custom" onclick="addOneGlassWater()" class="btn btn-secondary btn-sm">+ Thêm 1 ly (250ml)</button>
+          </div>
+        </div>
+
+        <!-- Danh sách món đã ăn theo 4 bữa -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <!-- Bữa sáng -->
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">🌅 Bữa sáng</h4>
+              <button onclick="switchTab('lookup')" class="text-[11px] text-green-600 hover:underline font-semibold">+ Thêm món</button>
+            </div>
+            <div id="diary-breakfast-list" class="space-y-2"></div>
+          </div>
+
+          <!-- Bữa trưa -->
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">☀️ Bữa trưa</h4>
+              <button onclick="switchTab('lookup')" class="text-[11px] text-green-600 hover:underline font-semibold">+ Thêm món</button>
+            </div>
+            <div id="diary-lunch-list" class="space-y-2"></div>
+          </div>
+
+          <!-- Bữa tối -->
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">🌙 Bữa tối</h4>
+              <button onclick="switchTab('lookup')" class="text-[11px] text-green-600 hover:underline font-semibold">+ Thêm món</button>
+            </div>
+            <div id="diary-dinner-list" class="space-y-2"></div>
+          </div>
+
+          <!-- Ăn vặt & Tráng miệng -->
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">🍿 Ăn vặt & Tráng miệng</h4>
+              <button onclick="switchTab('lookup')" class="text-[11px] text-green-600 hover:underline font-semibold">+ Thêm món</button>
+            </div>
+            <div id="diary-snack-list" class="space-y-2"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           TÍNH NĂNG 6: GAMIFICATION – HỌC MÀ CHƠI
+      ═══════════════════════════════════════════════════════════ -->
+      <div id="tab-gamification" class="tab-pane space-y-4">
+
+        <!-- Banner Tính năng 6 -->
+        <div class="feature-banner bg-gradient-to-br from-purple-700 via-indigo-700 to-fuchsia-800">
+          <span class="banner-tag">Tính năng 6</span>
+          <h2>Gamification – Học mà chơi</h2>
+          <p>Tích lũy XP · Duy trì chuỗi ngày Streak 🔥 · 5 câu hỏi Quiz AI mỗi ngày từ dễ đến khó · Đổi điểm mở khóa giao diện & Bộ sưu tập Huy hiệu</p>
+          <span class="banner-emoji">🎮</span>
+        </div>
+
+        <!-- Trạng thái học sinh & Tiến độ lên cấp -->
+        <div class="card p-5">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-white flex items-center justify-center text-3xl shadow-md flex-shrink-0">
+                🏆
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-extrabold text-base text-slate-900">Học sinh Cấp <span id="gamify-level">2</span></h3>
+                  <span id="gamify-streak" class="text-[10px] font-extrabold px-2 py-0.5 bg-orange-100 text-orange-800 rounded-full">3 ngày 🔥</span>
+                </div>
+                <p class="text-xs text-slate-500 font-medium">Danh hiệu: <strong class="text-green-700" id="gamify-title">Tập sự Khỏe mạnh</strong></p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="section-title">Tổng điểm thưởng</p>
+              <p class="text-2xl font-black text-amber-600"><span id="gamify-points">120</span> XP</p>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-1.5">
+            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+              <span>Tiến độ lên Cấp <span id="gamify-next-level">3</span></span>
+              <span><span id="gamify-points-to-next">80</span> XP nữa</span>
+            </div>
+            <div class="progress-track">
+              <div id="gamify-level-progress" class="progress-fill bg-gradient-to-r from-amber-400 to-orange-500" style="width: 20%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hộp Trắc nghiệm 5 câu hỏi Dinh dưỡng hàng ngày -->
+        <div class="card p-5 bg-gradient-to-r from-amber-50/80 via-orange-50/60 to-green-50/80 border-amber-200 flex flex-wrap items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🧠</span>
+              <h3 class="font-bold text-slate-800 text-sm">Trắc nghiệm Kiến thức Dinh dưỡng THPT (5 câu hỏi)</h3>
+            </div>
+            <p class="text-xs text-slate-600">
+              Mỗi ngày hệ thống tự chọn 5 câu hỏi từ Dễ đến Khó · Mỗi câu đúng <strong class="text-amber-700 font-bold">+20 XP</strong> · Kèm giải thích khoa học
+            </p>
+          </div>
+          <button id="btn-start-quiz" onclick="startNewQuizSession()" class="btn btn-primary pulse-active shadow-md">
+            🎯 Bắt đầu làm Quiz (5 câu) →
+          </button>
+        </div>
+
+        <!-- SƯU TẦM & ĐỔI ĐIỂM MỞ KHÓA GIAO DIỆN (THEMES) -->
+        <div class="card p-5 space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 class="section-title flex items-center gap-1.5 text-purple-700">
+              🎨 Đổi điểm mở khóa Giao diện (Themes)
+            </h3>
+            <span class="text-xs text-slate-500">Dùng XP tích lũy</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <!-- Theme 1: Default -->
+            <div class="p-3 rounded-xl border border-green-300 bg-green-50/50 flex flex-col justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-green-600"></span>
+                <span class="text-xs font-bold text-slate-800">Xanh Tươi Mát</span>
+              </div>
+              <button onclick="applyAppTheme('default')" class="btn btn-primary btn-sm w-full text-[11px]">
+                Áp dụng
+              </button>
+            </div>
+
+            <!-- Theme 2: Citrus -->
+            <div class="p-3 rounded-xl border border-orange-200 bg-orange-50/50 flex flex-col justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                <span class="text-xs font-bold text-slate-800">Cam Năng Động</span>
+              </div>
+              <button onclick="applyAppTheme('citrus')" class="btn btn-secondary btn-sm w-full text-[11px]">
+                Áp dụng
+              </button>
+            </div>
+
+            <!-- Theme 3: Ocean -->
+            <div class="p-3 rounded-xl border border-sky-200 bg-sky-50/50 flex flex-col justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+                <span class="text-xs font-bold text-slate-800">Đại Dương</span>
+              </div>
+              <button onclick="applyAppTheme('ocean')" class="btn btn-secondary btn-sm w-full text-[11px]">
+                Áp dụng
+              </button>
+            </div>
+
+            <!-- Theme 4: Galaxy -->
+            <div class="p-3 rounded-xl border border-purple-200 bg-purple-50/50 flex flex-col justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                <span class="text-xs font-bold text-slate-800">Tím Galaxy</span>
+              </div>
+              <button onclick="applyAppTheme('galaxy')" class="btn btn-secondary btn-sm w-full text-[11px]">
+                Áp dụng
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thử thách tuần có thanh tiến độ trực quan -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="section-title flex items-center gap-2">🎯 Thử thách tuần này</h3>
+            <span class="text-[11px] text-slate-400">Hoàn thành để nhận Huy hiệu</span>
+          </div>
+          <div id="gamify-challenges-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+        </div>
+
+        <!-- Bộ sưu tập Huy hiệu thành tích -->
+        <div class="space-y-2">
+          <h3 class="section-title flex items-center gap-2">🎖️ Bộ sưu tập Huy hiệu Dinh dưỡng</h3>
+          <div id="gamify-badges-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"></div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MOBILE BOTTOM NAVIGATION (6 TÍNH NĂNG CHUẨN)
+  ═══════════════════════════════════════════════════════════════ -->
+  <nav class="lg:hidden mobile-bottom-nav">
+    <button data-tab-target="profile" class="mobile-nav-btn active">
+      <span class="nav-icon">👤</span>Hồ sơ
+    </button>
+    <button data-tab-target="lookup" class="mobile-nav-btn">
+      <span class="nav-icon">🔍</span>Tra cứu
+    </button>
+    <button data-tab-target="camera" class="mobile-nav-btn">
+      <span class="nav-icon">📸</span>AI Cam
+    </button>
+    <button data-tab-target="mealplan" class="mobile-nav-btn">
+      <span class="nav-icon">🍱</span>Thực đơn
+    </button>
+    <button data-tab-target="diary" class="mobile-nav-btn">
+      <span class="nav-icon">📊</span>Nhật ký
+    </button>
+    <button data-tab-target="gamification" class="mobile-nav-btn">
+      <span class="nav-icon">🎮</span>Quiz
+    </button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CÁC HỘP THOẠI (MODALS)
+  ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Modal 1: Cấu hình Gemini AI API -->
+  <div id="gemini-api-modal" class="modal-overlay hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-panel bg-white max-w-lg w-full rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">✨</span>
+          <h3 class="font-bold text-slate-800">Cấu hình Google Gemini AI miễn phí</h3>
+        </div>
+        <button onclick="closeModal('gemini-api-modal')" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 text-lg">✕</button>
+      </div>
+
+      <div class="px-6 py-5 space-y-4">
+        <p class="text-xs text-slate-600 leading-relaxed">
+          NUTRIFUTURE hỗ trợ mô hình <strong>gemini-1.5-flash / gemini-2.0-flash</strong> của Google để nhận diện ảnh bữa ăn và tìm kiếm dinh dưỡng — <strong>hoàn toàn miễn phí, tốc độ cao và ít tốn quota</strong>.
+        </p>
+
+        <!-- Hướng dẫn 30 giây -->
+        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1.5">
+          <span class="font-extrabold text-amber-900 block">📌 Hướng dẫn lấy khóa Gemini API miễn phí trong 30 giây:</span>
+          <ol class="list-decimal list-inside space-y-1 text-amber-800">
+            <li>Truy cập <a href="https://aistudio.google.com/app/apikey" target="_blank" class="underline font-bold text-amber-950">aistudio.google.com/app/apikey</a></li>
+            <li>Đăng nhập bằng tài khoản Google (Gmail) của bạn</li>
+            <li>Nhấn <strong>"Create API Key"</strong> (Tạo khóa API) và sao chép mã khóa</li>
+            <li>Dán vào ô bên dưới rồi nhấn <strong>"Kiểm tra & Lưu"</strong></li>
+          </ol>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700">Khóa API cá nhân của bạn:</label>
+          <div class="flex gap-2">
+            <input type="password" id="gemini-api-key-input" placeholder="AIzaSy..." class="input font-mono text-xs flex-1">
+            <button id="btn-test-api-connection"
+                    onclick="testGeminiApiConnection()"
+                    type="button"
+                    class="btn btn-sm bg-sky-600 hover:bg-sky-700 text-white flex-shrink-0">
+              🔍 Kiểm tra
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400">
+            Khóa được lưu trực tiếp trong trình duyệt (LocalStorage) của bạn và hoàn toàn bảo mật, deploy tương thích 100% trên GitHub Pages.
+          </p>
+        </div>
+
+        <!-- Hộp kết quả kiểm tra API -->
+        <div id="api-test-result-box" class="hidden p-3 rounded-xl border text-xs space-y-1.5 transition-all">
+          <div class="flex items-center justify-between">
+            <span id="api-test-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold"></span>
+            <span id="api-test-latency" class="text-[10px] text-slate-400 font-mono"></span>
+          </div>
+          <div class="space-y-1 pt-1 border-t border-slate-100">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-500 font-semibold">Model kết nối:</span>
+              <strong id="api-test-active-model" class="text-slate-800 font-mono"></strong>
+            </div>
+            <p id="api-test-message" class="text-[11px] pt-1 text-slate-600 border-t border-slate-100 mt-1"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 border-t border-slate-100 flex gap-2 justify-end bg-slate-50 rounded-b-2xl">
+        <button id="btn-save-api-key" onclick="saveGeminiApiKeyFromModal()" class="btn btn-primary">Lưu khóa & Bắt đầu dùng</button>
+        <button onclick="closeModal('gemini-api-modal')" class="btn btn-secondary">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Chi tiết Món ăn (với Tùy chọn Size S / M / L & Red Alert) -->
+  <div id="food-detail-modal" class="modal-overlay hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-panel bg-white max-w-lg w-full rounded-2xl shadow-2xl relative" id="food-detail-modal-body"></div>
+  </div>
+
+  <!-- Modal 3: Thêm món vào Nhật ký (Chọn Bữa & Size) -->
+  <div id="add-diary-modal" class="modal-overlay hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-panel bg-white max-w-md w-full rounded-2xl shadow-2xl relative" id="add-diary-modal-body"></div>
+  </div>
+
+  <!-- Modal 4: Quiz Trắc nghiệm 5 câu hỏi -->
+  <div id="quiz-modal" class="modal-overlay hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="modal-panel bg-white max-w-lg w-full rounded-2xl shadow-2xl relative" id="quiz-modal-body"></div>
+  </div>
+
+  <!-- Khung thông báo nhanh (Toast) -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-5 right-4 z-50 space-y-2 w-80 pointer-events-none"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCRIPTS (DỮ LIỆU & BỘ XỬ LÝ ỨNG DỤNG)
+  ═══════════════════════════════════════════════════════════════ -->
+  <script src="foods-data.js"></script>
+  <script src="quiz-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
